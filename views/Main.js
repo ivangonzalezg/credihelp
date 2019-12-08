@@ -19,6 +19,7 @@ export default class Main extends Component {
 
   parseFloat(n = 0, p = "") {
     return new Promise((resolve, reject) => {
+      if (!/^\d+(\.?){1}(\d*)?$/.test(n)) reject({ message: `Formato de números incorrecto (${p.toUpperCase()})` });
       const r = parseFloat(n);
       if (r.toString() === "NaN") {
         reject({ message: `Formato de números incorrecto (${p.toUpperCase()})` });
@@ -30,12 +31,13 @@ export default class Main extends Component {
   calculate = async () => {
     try {
       let { capital, interest, fees } = this.state;
-      if (!capital) throw { message: "Ingrese el capital" };
-      if (!interest) throw { message: "Ingrese el interés mensual" };
-      if (!fees) throw { message: "Ingrese el número de cuotas" };
-      capital = await this.parseFloat(capital, "capital");
-      interest = (await this.parseFloat(interest, "interés mensual")) / 100;
-      fees = await this.parseFloat(fees, "número de cuotas");
+      if (!capital) throw { message: "Ingrese el cuánto cuesta tu producto" };
+      if (!interest) throw { message: "Ingrese cuáles son los intereses" };
+      if (!fees) throw { message: "Ingrese en cuántas cuotas deseas pagarlo" };
+      capital = await this.parseFloat(capital, "Cuanto cuesta tu producto");
+      interest = (await this.parseFloat(interest, "Cuáles son los intereses")) / 100;
+      fees = await this.parseFloat(fees, "En cuántas cuotas deseas pagarlo");
+      if (interest > 100) throw { message: "Interés mayor al 100%" };
       let mensualFees = (capital * interest) / (1 - Math.pow(1 + interest, -fees));
       let total = mensualFees * fees;
       mensualFees = mensualFees.toFixed(2);
@@ -53,29 +55,29 @@ export default class Main extends Component {
       <Container>
         <Text style={styles.title}>Credihelp</Text>
         <Br />
-        <Text style={styles.label}>Capital (COP):</Text>
+        <Text style={styles.label}>¿Cuánto cuesta tu producto? (COP):</Text>
         <TextInput
           keyboardType="decimal-pad"
           value={capital}
           onChangeText={capital => this.setState({ capital })}
           style={styles.input}
-          placeholder="Capital"
+          placeholder="¿Cuanto cuesta tu producto?"
         />
-        <Text style={styles.label}>Interés mensual (%):</Text>
+        <Text style={styles.label}>¿Cuáles son los intereses? (%):</Text>
         <TextInput
           keyboardType="decimal-pad"
           value={interest}
           onChangeText={interest => this.setState({ interest })}
           style={styles.input}
-          placeholder="Interés mensual"
+          placeholder="¿Cuáles son los intereses?"
         />
-        <Text style={styles.label}>Número de cuotas:</Text>
+        <Text style={styles.label}>¿En cuántas cuotas deseas pagarlo?:</Text>
         <TextInput
           keyboardType="decimal-pad"
           value={fees}
           onChangeText={fees => this.setState({ fees })}
           style={styles.input}
-          placeholder="Número de cuotas"
+          placeholder="¿En cuántas cuotas deseas pagarlo?"
         />
         <Br />
         <Button title="Calcular" color="#10ac84" onPress={this.calculate} />
@@ -83,9 +85,9 @@ export default class Main extends Component {
         <Br />
         {showAnswer && (
           <View>
-            <Text style={styles.label}>Cuota mensual (COP):</Text>
+            <Text style={styles.label}>El valor de tu cuota será (COP):</Text>
             <Text style={styles.input}>{mensualFees}</Text>
-            <Text style={styles.label}>Total a pagar (COP):</Text>
+            <Text style={styles.label}>Al final de tu crédito habrás pagado (COP):</Text>
             <Text style={styles.input}>{total}</Text>
           </View>
         )}
