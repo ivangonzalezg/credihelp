@@ -8,27 +8,39 @@ export default class Main extends Component {
     super(props);
 
     this.state = {
-      capital: "520",
-      interest: "14",
-      fees: "10",
+      capital: "",
+      interest: "",
+      fees: "",
       mensualFees: "",
       total: "",
       showAnswer: false
     };
   }
 
-  calculate = () => {
+  parseFloat(n = 0, p = "") {
+    return new Promise((resolve, reject) => {
+      const r = parseFloat(n);
+      if (r.toString() === "NaN") {
+        reject({ message: `Formato de números incorrecto (${p.toUpperCase()})` });
+      }
+      resolve(r);
+    });
+  }
+
+  calculate = async () => {
     try {
       let { capital, interest, fees } = this.state;
       if (!capital) throw { message: "Ingrese el capital" };
-      if (!interest) throw { message: "Ingrese el interés" };
+      if (!interest) throw { message: "Ingrese el interés mensual" };
       if (!fees) throw { message: "Ingrese el número de cuotas" };
-      capital = parseFloat(capital);
-      interest = parseFloat(interest) / 100;
-      fees = parseFloat(fees);
-      const mensualFees = (capital * interest) / (1 - Math.pow(1 + interest, -fees));
-      const total = mensualFees * fees;
-      this.setState({ mensualFees: mensualFees.toFixed(2), total, showAnswer: true });
+      capital = await this.parseFloat(capital, "capital");
+      interest = (await this.parseFloat(interest, "interés mensual")) / 100;
+      fees = await this.parseFloat(fees, "número de cuotas");
+      let mensualFees = (capital * interest) / (1 - Math.pow(1 + interest, -fees));
+      let total = mensualFees * fees;
+      mensualFees = mensualFees.toFixed(2);
+      total = total.toFixed(2);
+      this.setState({ mensualFees, total, showAnswer: true });
     } catch (error) {
       Alert.alert("Error", error.message);
       this.setState({ showAnswer: false });
@@ -49,13 +61,13 @@ export default class Main extends Component {
           style={styles.input}
           placeholder="Capital"
         />
-        <Text style={styles.label}>Interés (%):</Text>
+        <Text style={styles.label}>Interés mensual (%):</Text>
         <TextInput
           keyboardType="decimal-pad"
           value={interest}
           onChangeText={interest => this.setState({ interest })}
           style={styles.input}
-          placeholder="Interés"
+          placeholder="Interés mensual"
         />
         <Text style={styles.label}>Número de cuotas:</Text>
         <TextInput

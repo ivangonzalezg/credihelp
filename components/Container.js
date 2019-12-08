@@ -14,7 +14,7 @@ export default class Container extends Component {
   render() {
     return (
       <LinearGradient
-        colors={["#2bb799", "#75e4c4"]}
+        colors={["#2cb79a", "#75e4c4"]}
         style={{
           flex: 1,
           paddingTop: StatusBar.currentHeight
