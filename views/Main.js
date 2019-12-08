@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { StyleSheet, Text, TextInput, Button, Alert, View } from "react-native";
+import { StyleSheet, Text, TextInput, Button, Alert, View, Image } from "react-native";
 import Container from "../components/Container";
 import Br from "../components/Br";
 
@@ -37,7 +37,6 @@ export default class Main extends Component {
       capital = await this.parseFloat(capital, "Cuanto cuesta tu producto");
       interest = (await this.parseFloat(interest, "Cuáles son los intereses")) / 100;
       fees = await this.parseFloat(fees, "En cuántas cuotas deseas pagarlo");
-      if (interest > 100) throw { message: "Interés mayor al 100%" };
       let mensualFees = (capital * interest) / (1 - Math.pow(1 + interest, -fees));
       let total = mensualFees * fees;
       mensualFees = mensualFees.toFixed(2);
@@ -53,8 +52,9 @@ export default class Main extends Component {
     const { capital, interest, fees, mensualFees, total, showAnswer } = this.state;
     return (
       <Container>
-        <Text style={styles.title}>Credihelp</Text>
-        <Br />
+        <View style={styles.title}>
+          <Image source={require("../assets/title.png")} style={styles.image} />
+        </View>
         <Text style={styles.label}>¿Cuánto cuesta tu producto? (COP):</Text>
         <TextInput
           keyboardType="decimal-pad"
@@ -113,9 +113,11 @@ const styles = StyleSheet.create({
     fontSize: 20
   },
   title: {
-    color: "white",
-    fontSize: 30,
-    textAlign: "center"
+    alignItems: "center"
+  },
+  image: {
+    width: 200,
+    resizeMode: "contain"
   },
   searchButton: {
     backgroundColor: "#14CA9B",
